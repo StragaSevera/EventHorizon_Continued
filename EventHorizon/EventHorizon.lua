@@ -2479,8 +2479,11 @@ function ns:CheckRequirements()
 
     --print("nRT Check:", nRT, vars.currentTalents[nRT])
     if nRT then
-      if vars.currentTalents[nRT] then
-        haveTalentRequiredUnselected = nil
+      if type(nRT) == 'number' then
+        nRT = {nRT}
+      end
+      for i, talent in ipairs(nRT) do
+        haveTalentRequiredUnselected = haveTalentRequiredUnselected and not vars.currentTalents[talent]
       end
     end
 
@@ -2717,11 +2720,11 @@ function ns:newSpell(config) -- New class config to old class config
       n.debuff = c.debuff[1]
       n.dot = c.debuff[2]
     end
+    n.pandemic = c.pandemic
   elseif c.debuff then
     n.debuff = c.debuff
+    n.pandemic = c.pandemic
   end
-
-
 
   if type(c.playerbuff) == "table" and not n.debuff then
     if type(c.playerbuff[1]) == "table" then
@@ -3130,6 +3133,17 @@ function ns:CreateSpellBar(config)
 
   if config.slotID then
     spellframe:PLAYER_EQUIPMENT_CHANGED(config.slotID)  -- Initialize trinkets and such if needed.
+  end
+
+  -- add a pandemic indicator, if requested
+  -- note that I have absolutely NO IDEA on how to make sure that the spell is a DoT or what its duration is, because I cannot find any useful API function which returns the data used to create the tooltip
+  if config.pandemic then
+    spellframe.pandemicTex = spellframe:CreateTexture(nil,"OVERLAY")
+    local position = (config.pandemic-vars.past)*vars.scale*vars.barwidth
+    spellframe.pandemicTex:SetPoint('TOPLEFT', spellframe, 'TOPLEFT', position, 0)
+    spellframe.pandemicTex:SetColorTexture(unpack({0,1,0,0.5}))
+    spellframe.pandemicTex:SetWidth(vars.onepixelwide)
+    spellframe.pandemicTex:SetPoint('BOTTOM', spellframe, "BOTTOM")
   end
 
   return spellframe

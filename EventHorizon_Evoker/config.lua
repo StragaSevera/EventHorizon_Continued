@@ -2,4 +2,11 @@ local usemouseover = true    -- Make this false or nil (or just delete the line 
 
 function EventHorizon:InitializeClass()
 
+  print('Evoker init')
+
+  -- Fire Breath
+  self:newSpell({
+    cooldown = 357208,
+  })
+
 end
